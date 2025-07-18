@@ -38,8 +38,6 @@ PushB = $60
 Ground = $81
 
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Subroutines ;;;
 vblankwait:
@@ -194,11 +192,9 @@ GameEngine:
 
 GameOverScreen:
 
+;Disables everything and changes BG
 
-
-
-
-LDA #$00
+LDA #$00 
 STA $2000
 STA $2001
 
@@ -207,7 +203,7 @@ LDA #$50
 STA $2000
 STA $2001
 
-
+;Plays crashing sound
 
 LDA #%00001000       ; Bit 3 set = enable noise channel
   STA $4015
