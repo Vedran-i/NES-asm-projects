@@ -24,25 +24,17 @@ TitleScreen = $00
 PlayingGame = $01 
 GameOver = $02
 
-Sprite1_Y = $0204
+Sprite1_Y = $0200
 Sprite2_Y = $0280
-Sprite3_Y = $0284
-Sprite4_Y = $0288
+Sprite3_Y = $029C
 
-Sprite1_X = $0208
+Player1SpriteTwo_Y = $021C
+
+Sprite1_X = $0203
 Sprite2_X = $0283
-Sprite3_X = $0287
-Sprite4_X = $028B
+Sprite3_X = $029F
 
-Sprite1index = $0201
-
-
-DelayFunction = $33
-
-PushB = $60
-Ground = $10
-Colorz = $00
-
+Player1SpriteTwo_X = $021F
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -325,9 +317,8 @@ ReadAT:
   BEQ ReadADoneT   ; branch to ReadADone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
 
-
-
-
+  
+ 
   LDA #$01
   STA GameState
 
@@ -344,7 +335,8 @@ ReadADoneT:        ; handling this button is done
 EnginePlaying:
 
 
-;removes the title whrn game starts
+
+;removes the title when game starts
 
 LDA #$FF
 STA $02E0
@@ -420,6 +412,8 @@ LDA #$FF
 STA $02AC
 LDA #$FF
 STA $02A8
+
+
 
 LDA #$5E
 STA $02A7
@@ -1056,113 +1050,138 @@ Check_Collision:
 
   LDA Sprite1_X
   CLC
-  ADC Sprite2_X
-  BCC NoCollisionX
+  ADC #8 
+  CMP Sprite2_X
+  BCC NoCollision
 
-  CMP #$08
-  BCS NoCollisionX
+  LDA Sprite2_X
+  CLC
+  ADC #8 
+  CMP Sprite1_X
+  BCC NoCollision
 
   LDA Sprite1_Y
-  SEC
-  SBC Sprite2_Y
-  BCC NoCollisionY
+  CLC
+  ADC #8 
+  CMP Sprite2_Y
+  BCC NoCollision
 
-  CMP #$08
-  BCS NoCollisionY
+  LDA Sprite2_Y
+  CLC
+  ADC #8 
+  CMP Sprite1_Y
+  BCC NoCollision
 
   JMP CollisionDetected
 
-NoCollisionX:
-
-NoCollisionY:
+NoCollision:
 
 
 
 CheckOtherCollision:
 
-
-
   LDA Sprite1_X
   CLC
-  ADC Sprite3_X
-  BCC NoCollisionX1
+  ADC #8 
+  CMP Sprite3_X
+  BCC NoCollision2
 
-  CMP #$08
-  BCS NoCollisionX1
+  LDA Sprite3_X
+  CLC
+  ADC #8 
+  CMP Sprite1_X
+  BCC NoCollision2
 
   LDA Sprite1_Y
-  SEC
-  SBC Sprite3_Y
-  BCC NoCollisionY1
+  CLC
+  ADC #8 
+  CMP Sprite3_Y
+  BCC NoCollision2
 
-  CMP #$08
-  BCS NoCollisionY1
+  LDA Sprite3_Y
+  CLC
+  ADC #8 
+  CMP Sprite1_Y
+  BCC NoCollision2
 
   JMP CollisionDetected
 
-NoCollisionX1:
-
-NoCollisionY1:
+NoCollision2:
 
 
 
+CheckOtherCollision2:
 
-
-CheckOtherOtherCollision:
-
-
-
-  LDA Sprite1_X
+  LDA Player1SpriteTwo_X
   CLC
-  ADC Sprite4_X
-  BCC NoCollisionX11
+  ADC #8 
+  CMP Sprite2_X
+  BCC NoCollision2x
 
-  CMP #$08
-  BCS NoCollisionX11
+  LDA Sprite2_X
+  CLC
+  ADC #8 
+  CMP Player1SpriteTwo_X
+  BCC NoCollision2x
 
-  LDA Sprite1_Y
-  SEC
-  SBC Sprite4_Y
-  BCC NoCollisionY11
+  LDA Player1SpriteTwo_Y
+  CLC
+  ADC #8 
+  CMP Sprite2_Y
+  BCC NoCollision2x
 
-  CMP #$08
-  BCS NoCollisionY11
+  LDA Sprite2_Y
+  CLC
+  ADC #8 
+  CMP Player1SpriteTwo_Y
+  BCC NoCollision2x
 
   JMP CollisionDetected
 
-NoCollisionX11:
-
-NoCollisionY11:
+NoCollision2x:
 
 
 
 
 
+heckOtherCollision2x:
+
+  LDA Player1SpriteTwo_X
+  CLC
+  ADC #8 
+  CMP Sprite3_X
+  BCC NoCollision2xx
+
+  LDA Sprite3_X
+  CLC
+  ADC #8 
+  CMP Player1SpriteTwo_X
+  BCC NoCollision2xx
+
+  LDA Player1SpriteTwo_Y
+  CLC
+  ADC #8 
+  CMP Sprite3_Y
+  BCC NoCollision2xx
+
+  LDA Sprite3_Y
+  CLC
+  ADC #8 
+  CMP Player1SpriteTwo_Y
+  BCC NoCollision2xx
+
+  JMP CollisionDetected
+
+NoCollision2xx:
 
 
 RTI             ; return from interrupt
 
-Sunset:
-
-  LDA #PushB     
-  CLC
-  ADC #$01
-  STA $020C
-
-  LDA #$3F
-  STA $2006
-  LDA #$00
-  STA $2006        ; Set PPU address to $3F00 (background color)
-
-  LDA #$27         ; Color value (change this to any valid NES color)
-  STA $2007        ; Write to palette
-
-LDA #$08
-STA Speed
 
 
 
-RTS
+
+
 
 
 
@@ -1188,32 +1207,6 @@ STA $202
   STA GameState
 
 
-
-CollisionDetectedSpeed:
-
-LDA #$08
-STA Speed
-
-
-
-
-RTI
-
-
-
-
-delay:
-DelayLoop2:
-    ldx #$FF            ; Outer loop for a longer delay   
-DelayLoopOuter2:
-    ldy #$FF            ; Inner loop
-DelayLoopInner2:
-    dey
-    CMP #$00
-    bne DelayLoopInner2  ; Repeat inner loop until Y = 0
-    dex
-    bne DelayLoopOuter2  ; Repeat outer loop until X = 0
-RTS
 
 
 movingBG:
@@ -1393,6 +1386,17 @@ STA $029F
 
 
 RTS
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1588,15 +1592,15 @@ sprites:
   .byte $30, $8D, $02, $C0   ;   
 
 
-  .byte $40, $98, $02, $50   ;      press A 
-  .byte $40, $99, $02, $58   ;
-  .byte $40, $9A, $02, $64   ;
+  .byte $40, $98, $03, $50   ;      press A 
+  .byte $40, $99, $03, $58   ;
+  .byte $40, $9A, $03, $64   ;
 
-  .byte $40, $9B, $02, $90   ; vedran 2025
-  .byte $40, $9C, $02, $98   ;
-  .byte $40, $9D, $02, $A0   ;
-  .byte $40, $F7, $02, $A9   ;
-  .byte $40, $9E, $02, $B2   ;
+  .byte $40, $9B, $03, $90   ; vedran 2025
+  .byte $40, $9C, $03, $98   ;
+  .byte $40, $9D, $03, $A0   ;
+  .byte $40, $8E, $03, $A9   ;
+  .byte $40, $8F, $03, $B1   ;
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
