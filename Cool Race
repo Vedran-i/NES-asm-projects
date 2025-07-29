@@ -16,6 +16,8 @@
     GameState: .res 1
     Speed: .res 1
     Speed2: .res 1
+    TimerCounter:      .res 1    ; current timer value (0 to 9)
+    FrameDelayCounter: .res 1    ; how many frames to wait before incrementing timer  
 .segment "CODE"
 
 
@@ -334,7 +336,7 @@ ReadADoneT:        ; handling this button is done
 
 EnginePlaying:
 
-
+JSR StartTimer
 
 ;removes the title when game starts
 
@@ -412,6 +414,8 @@ LDA #$FF
 STA $02AC
 LDA #$FF
 STA $02A8
+
+
 
 
 
@@ -1388,10 +1392,43 @@ STA $029F
 RTS
 
 
+StartTimer:
+    ; Increment frame delay counter
+    LDA FrameDelayCounter
+    CLC
+    ADC #1
+    STA FrameDelayCounter
+
+    CMP #$FF             ; wait ~32 frames (adjust as needed)
+    BNE SkipTimerInc     ; not yet time to increment
+
+    ; Reset frame delay
+    LDA #$00
+    STA FrameDelayCounter
+
+    ; Load current timer value
+    LDA TimerCounter
+    CMP #$09
+    BEQ TimerDone        ; If timer == 9, jump to done routine
+
+    ; Increment timer
+    CLC
+    ADC #1
+    STA TimerCounter
+    STA $02E5            ; update timer sprite with new value
+;1 5 9 D
+SkipTimerInc:
+    RTS
+
+TimerDone:
+    ; Call your subroutine here
+    JSR TimerReachedNine
+    RTS
 
 
+TimerReachedNine:
 
-
+JMP CollisionDetected
 
 
 
@@ -1552,13 +1589,13 @@ sprites:
 
 
   .byte $55, $0A, $01, $10   ;  mountain 1 - base
-  .byte $55, $02, $01, $17   ;    
-  .byte $55, $02, $01, $1F   ;    
+  .byte $55, $10, $01, $17   ;    
+  .byte $55, $10, $01, $1F   ;    
   .byte $55, $0A, $71, $27   ;      
 
   .byte $55, $0A, $01, $80   ;  mountain 2 - base
-  .byte $55, $02, $01, $87   ;    
-  .byte $55, $02, $01, $8F   ;    
+  .byte $55, $10, $01, $87   ;    
+  .byte $55, $10, $01, $8F   ;    
   .byte $55, $0A, $71, $97   ;      
 
 
@@ -1601,6 +1638,8 @@ sprites:
   .byte $40, $9D, $03, $A0   ;
   .byte $40, $8E, $03, $A9   ;
   .byte $40, $8F, $03, $B1   ;
+
+  .byte $10, $B1, $00, $10   ;
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
