@@ -34,6 +34,9 @@ Sprite2_X = $0283
 Sprite3_X = $0287
 Sprite4_X = $028B
 
+Sprite1index = $0201
+
+
 DelayFunction = $33
 
 PushB = $60
@@ -166,8 +169,11 @@ insideloop:
     LDA #%00011110  ; background and sprites enable, no left clipping
     STA $2001
 
+
+
 forever:
     JMP forever 
+
 
 
 
@@ -201,10 +207,11 @@ VBLANK:
 
 
 GameEngine:  
+
+
   LDA GameState
   CMP #0
   BEQ EngineTitle    ;;game is displaying title screen
-
 
   LDA GameState
   CMP #1
@@ -216,7 +223,6 @@ GameEngine:
 
 
 GameOverScreen:
-
 
 
 
@@ -301,8 +307,6 @@ GameEngineDone:
 
 
 
-
-
 EngineTitle:
 
 
@@ -322,6 +326,8 @@ ReadAT:
                   ; add instructions here to do something when button IS pressed (1)
 
 
+
+
   LDA #$01
   STA GameState
 
@@ -333,13 +339,99 @@ ReadADoneT:        ; handling this button is done
 
  JMP GameEngineDone
 
+
+
 EnginePlaying:
 
 
+;removes the title whrn game starts
 
+LDA #$FF
+STA $02E0
+LDA #$FF
+STA $02E3
 
+LDA #$FF
+STA $02DF
+LDA #$FF
+STA $02DC
 
+LDA #$FF
+STA $02DC
+LDA #$FF
+STA $02D8
+
+LDA #$FF
+STA $02D7
+LDA #$FF
+STA $02D4
+
+LDA #$FF
+STA $02D3
+LDA #$FF
+STA $02D0
+
+LDA #$FF
+STA $02CF
+LDA #$FF
+STA $02CC
+
+LDA #$FF
+STA $02CC
+LDA #$FF
+STA $02C8
+
+LDA #$FF
+STA $02C7
+LDA #$FF
+STA $02C4
      
+LDA #$FF
+STA $02C3
+LDA #$FF
+STA $02C0
+
+LDA #$FF
+STA $02BF
+LDA #$FF
+STA $02BC
+
+LDA #$FF
+STA $02BC
+LDA #$FF
+STA $02B8
+
+LDA #$FF
+STA $02B7
+LDA #$FF
+STA $02B4
+
+LDA #$FF
+STA $02B3
+LDA #$FF
+STA $02B0
+
+LDA #$FF
+STA $02AF
+LDA #$FF
+STA $02AC
+
+LDA #$FF
+STA $02AC
+LDA #$FF
+STA $02A8
+
+LDA #$5E
+STA $02A7
+LDA #$CD
+STA $02A4
+LDA #$F5
+STA $02A5
+LDA #$01
+STA $02A6
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; sprite / nametable / attributes / palettes
 
@@ -360,6 +452,7 @@ ReadA:
 
 
 
+
 ReadADone:        ; handling this button is done
   
 ReadB: 
@@ -368,14 +461,28 @@ ReadB:
   BEQ ReadBDone   ; branch to ReadBDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
 
-  
+
+  LDA #$F6
+  STA $02A5
+  JSR movingBG
+
 
 ReadBDone:        ; handling this button is done
+
+  LDA #$FC
+  STA $02A1
+
+  
+
 
 ReadSelect: 
   LDA $4016       ; player 1 - B
   AND #%00000001  ; only look at bit 0
   BEQ ReadSelectDone   ; branch to ReadBDone if button is NOT pressed (0)
+
+
+LDA $20
+
 
 ReadSelectDone:        ; handling this button is done
 
@@ -943,6 +1050,8 @@ ADC #$02
 STA $029F
 
 
+
+
 Check_Collision:
 
   LDA Sprite1_X
@@ -1019,7 +1128,7 @@ CheckOtherOtherCollision:
   CMP #$08
   BCS NoCollisionY11
 
-  JMP CollisionDetectedSpeed
+  JMP CollisionDetected
 
 NoCollisionX11:
 
@@ -1107,6 +1216,183 @@ DelayLoopInner2:
 RTS
 
 
+movingBG:
+;road lines that move
+
+LDA $0223 
+CLC
+ADC #$03
+STA $0223
+
+LDA $0227 
+CLC
+ADC #$03
+STA $0227
+
+LDA $022B 
+CLC
+ADC #$03
+STA $022B
+
+LDA $022F 
+CLC
+ADC #$03
+STA $022F
+
+;grass
+
+LDA $0233
+CLC
+ADC #$03
+STA $0233
+
+LDA $0237
+CLC
+ADC #$03
+STA $0237
+
+LDA $023B
+CLC
+ADC #$03
+STA $023B
+
+LDA $023F
+CLC
+ADC #$03
+STA $023F
+
+LDA $0243
+CLC
+ADC #$03
+STA $0243
+
+LDA $0247
+CLC
+ADC #$03
+STA $0247
+
+LDA $024B
+CLC
+ADC #$03
+STA $024B
+
+LDA $024F
+CLC
+ADC #$03
+STA $024F
+
+; Mountains
+
+LDA $0253
+CLC
+ADC #$01
+STA $0253
+
+LDA $0257
+CLC
+ADC #$01
+STA $0257
+
+LDA $025B
+CLC
+ADC #$01
+STA $025B
+
+LDA $025F
+CLC
+ADC #$01
+STA $025F
+
+
+
+LDA $0263
+CLC
+ADC #$01
+STA $0263
+
+LDA $0267
+CLC
+ADC #$01
+STA $0267
+
+LDA $026B
+CLC
+ADC #$01
+STA $026B
+
+LDA $026F
+CLC
+ADC #$01
+STA $026F
+
+
+
+LDA $0273
+CLC
+ADC #$01
+STA $0273
+
+LDA $0277
+CLC
+ADC #$01
+STA $0277
+
+LDA $027B
+CLC
+ADC #$01
+STA $027B
+
+LDA $027F
+CLC
+ADC #$01
+STA $027F
+
+;enemy1
+LDA $0283 
+CLC
+ADC #$01
+STA $0283
+
+LDA $0287
+CLC
+ADC #$01
+STA $0287
+
+LDA $028B
+CLC
+ADC #$01
+STA $028B
+
+LDA $028F
+CLC
+ADC #$01
+STA $028F
+
+;enemy2
+LDA $0293
+CLC
+ADC #$02
+STA $0293
+
+LDA $0297
+CLC
+ADC #$02
+STA $0297
+
+LDA $029B
+CLC
+ADC #$02
+STA $029B
+
+LDA $029F
+CLC
+ADC #$02
+STA $029F
+
+
+
+
+RTS
 
 
 
@@ -1189,7 +1475,7 @@ background:
   .byte $E0,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25  ;;row 1
   .byte $25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
 
-  .byte $E0,$25,$25,$D3,$E4,$25,$D4,$D5,$D6,$D7,$D9,$25,$D8,$25,$25,$E3  ;;row 1
+  .byte $E0,$25,$25,$D3,$E4,$25,$D4,$D5,$D6,$D7,$D9,$25,$25,$25,$25,$E3  ;;row 1
   .byte $E3,$E3,$E3,$E3,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
 
   .byte $E0,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25  ;;row 1
@@ -1287,7 +1573,31 @@ sprites:
   .byte $A0, $0E, $00, $90   ;  enemy car2
   .byte $A0, $0F, $00, $98   ;        
   .byte $A8, $1E, $00, $90   ; 
-  .byte $A8, $1F, $00, $98   ;         
+  .byte $A8, $1F, $00, $98   ;      
+
+  .byte $CC, $FC, $02, $60   ;        
+
+
+  .byte $30, $88, $02, $40   ;  Cool race  
+  .byte $30, $89, $02, $50   ;    
+  .byte $30, $89, $02, $60   ;  
+  .byte $30, $8A, $02, $70   ;       
+  .byte $30, $8B, $02, $90   ;
+  .byte $30, $8C, $02, $A0   ;   
+  .byte $30, $88, $02, $B0   ;  C    
+  .byte $30, $8D, $02, $C0   ;   
+
+
+  .byte $40, $98, $02, $50   ;      press A 
+  .byte $40, $99, $02, $58   ;
+  .byte $40, $9A, $02, $64   ;
+
+  .byte $40, $9B, $02, $90   ; vedran 2025
+  .byte $40, $9C, $02, $98   ;
+  .byte $40, $9D, $02, $A0   ;
+  .byte $40, $F7, $02, $A9   ;
+  .byte $40, $9E, $02, $B2   ;
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .segment "VECTORS"
