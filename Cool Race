@@ -18,6 +18,12 @@
     Speed2: .res 1
     TimerCounter:      .res 1    ; current timer value (0 to 9)
     FrameDelayCounter: .res 1    ; how many frames to wait before incrementing timer  
+    TimerCounter2:      .res 1    ; current timer value (0 to 9)
+    FrameDelayCounter2: .res 1    ; how many frames to wait before incrementing timer  
+    TimerCounter3:      .res 1    ; current timer value (0 to 9)
+    FrameDelayCounter3: .res 1    ; how many frames to wait before incrementing timer 
+    TimerCounterX:      .res 1    ; current timer value (0 to 9)
+    FrameDelayCounterX: .res 1    ; how many frames to wait before incrementing timer 
 .segment "CODE"
 
 
@@ -337,8 +343,13 @@ ReadADoneT:        ; handling this button is done
 EnginePlaying:
 
 JSR StartTimer
+JSR StartTimer2
+JSR StartTimer3
+JSR StartTimerX
+
 
 ;removes the title when game starts
+
 
 LDA #$FF
 STA $02E0
@@ -360,10 +371,16 @@ STA $02D7
 LDA #$FF
 STA $02D4
 
-LDA #$FF
+LDA #$FF ;car icon pos
 STA $02D3
 LDA #$FF
 STA $02D0
+
+LDA #$43  ;car icon lower right index
+STA $02D1
+
+LDA #$02  ;palette
+STA $02D2
 
 LDA #$FF
 STA $02CF
@@ -479,7 +496,6 @@ ReadSelect:
   BEQ ReadSelectDone   ; branch to ReadBDone if button is NOT pressed (0)
 
 
-LDA $20
 
 
 ReadSelectDone:        ; handling this button is done
@@ -1392,6 +1408,61 @@ STA $029F
 RTS
 
 
+
+StartTimerX:
+    ; Increment frame delay counter
+    LDA FrameDelayCounterX
+    CLC
+    ADC #1
+    STA FrameDelayCounterX
+
+    CMP #$20             ; wait ~32 frames (adjust as needed)
+    BNE SkipTimerIncX     ; not yet time to increment
+
+    ; Reset frame delay
+    LDA #$00
+    STA FrameDelayCounterX
+
+    ; Load current timer value
+    LDA TimerCounterX
+    CMP #$09
+    BEQ TimerDoneX        ; If timer == 9, jump to done routine
+
+    ; Increment timer
+    CLC
+    ADC #$01
+    STA TimerCounterX
+
+LDA $02EB
+  CLC
+    ADC #$01
+
+    STA $02EB
+
+
+SkipTimerIncX:
+    RTS
+
+TimerDoneX:
+    ; Call your subroutine here
+    JSR TimerReachedNineX
+    RTS
+
+
+TimerReachedNineX:
+
+RTS
+
+
+
+
+
+
+
+
+
+
+
 StartTimer:
     ; Increment frame delay counter
     LDA FrameDelayCounter
@@ -1415,8 +1486,11 @@ StartTimer:
     CLC
     ADC #1
     STA TimerCounter
-    STA $02E5            ; update timer sprite with new value
-;1 5 9 D
+    STA $02E5            ; update timer sprite with new value ;1 5 9 D
+ 
+
+
+
 SkipTimerInc:
     RTS
 
@@ -1428,14 +1502,229 @@ TimerDone:
 
 TimerReachedNine:
 
-JMP CollisionDetected
+JSR youwin
+
+
+RTS
+
+
+
+
+StartTimer2:
+    ; Increment frame delay counter
+    LDA FrameDelayCounter2
+    CLC
+    ADC #1
+    STA FrameDelayCounter2
+
+    CMP #$20             ; wait ~32 frames (adjust as needed)
+    BNE SkipTimerInc     ; not yet time to increment
+
+    ; Reset frame delay
+    LDA #$00
+    STA FrameDelayCounter2
+
+    ; Load current timer value
+    LDA TimerCounter2
+    CMP #$08
+    BEQ TimerDone2        ; If timer == 9, jump to done routine
+
+    ; Increment timer
+    CLC
+    ADC #1
+    STA TimerCounter2
+    
+
+SkipTimerInc2:
+    RTS
+
+TimerDone2:
+    ; Call your subroutine here
+    JSR TimerReachedNine2
+    RTS
+
+TimerReachedNine2:
+
+LDA $0280 
+CLC
+ADC #$01
+STA $0280
+
+LDA $0284
+CLC
+ADC #$01
+STA $0284
+
+LDA $0288
+CLC
+ADC #$01
+STA $0288
+
+LDA $028C
+CLC
+ADC #$01
+STA $028C
+
+RTS
 
 
 
 
 
 
+StartTimer3:
+    ; Increment frame delay counter
+    LDA FrameDelayCounter3
+    CLC
+    ADC #1
+    STA FrameDelayCounter3
 
+    CMP #$20             ; wait ~32 frames (adjust as needed)
+    BNE SkipTimerInc     ; not yet time to increment
+
+    ; Reset frame delay
+    LDA #$00
+    STA FrameDelayCounter3
+
+    ; Load current timer value
+    LDA TimerCounter3
+    CMP #$02
+    BEQ TimerDone3        ; If timer == 9, jump to done routine
+
+    ; Increment timer
+    CLC
+    ADC #1
+    STA TimerCounter3
+    
+
+SkipTimerInc3:
+    RTS
+
+TimerDone3:
+    ; Call your subroutine here
+    JSR TimerReachedNine3
+    RTS
+
+TimerReachedNine3:
+
+LDA $0280 
+SEC
+SBC #$02
+STA $0280
+
+LDA $0284
+SEC
+SBC #$02
+STA $0284
+
+LDA $0288
+SEC
+SBC #$02
+STA $0288
+
+LDA $028C
+SEC
+SBC #$02
+STA $028C
+
+
+;car2
+
+LDA $0293
+SEC
+SBC #$03
+STA $0293
+
+LDA $0297
+SEC
+SBC #$03
+STA $0297
+
+LDA $029B
+SEC
+SBC #$03
+STA $029B
+
+LDA $029F
+SEC
+SBC #$03
+STA $029F
+
+LDA #$00
+
+STA TimerCounter3
+
+RTS
+
+
+youwin:
+
+
+
+
+
+LDA #$30
+STA $0230
+LDA #$60
+STA $0233
+
+LDA #$68
+STA $0237
+LDA #$30
+STA $0234
+
+LDA #$78
+STA $023B
+LDA #$30
+STA $0238
+
+LDA #$80
+STA $023F
+LDA #$30
+STA $023C
+
+;index
+LDA #$24
+STA $0231
+
+LDA #$25
+STA $0235
+
+LDA #$26
+STA $0239
+
+LDA #$27
+STA $023D
+
+LDA #%00011110
+STA $2001
+
+;color
+
+LDA #$27
+STA $0232
+
+LDA #$27
+STA $0236
+
+LDA #$27
+STA $023A
+
+LDA #$27
+STA $023E
+
+
+LDA #2
+STA GameState
+
+JMP theend
+
+RTI
+
+theend:
+
+BRK
+JMP theend
 
 background:
   .byte $24,$24,$24,$24,$24,$24,$24,$24,$24,$24,$24,$24,$24,$24,$24,$24  ;;row 1
@@ -1517,7 +1806,7 @@ background:
   .byte $25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
 
   .byte $E0,$25,$25,$D3,$E4,$25,$D4,$D5,$D6,$D7,$D9,$25,$25,$25,$25,$E3  ;;row 1
-  .byte $E3,$E3,$E3,$E3,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
+  .byte $E3,$E3,$E3,$E3,$25,$25,$25,$25,$25,$CE,$CC,$CD,$25,$25,$25,$E2  ;;row 1
 
   .byte $E0,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25  ;;row 1
   .byte $25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
@@ -1640,6 +1929,8 @@ sprites:
   .byte $40, $8F, $03, $B1   ;
 
   .byte $10, $B1, $00, $10   ;
+
+  .byte $CC, $43, $02, $A4   ;
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
