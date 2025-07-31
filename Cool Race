@@ -1416,7 +1416,7 @@ StartTimerX:
     ADC #1
     STA FrameDelayCounterX
 
-    CMP #$20             ; wait ~32 frames (adjust as needed)
+    CMP #$70             ; wait ~32 frames (adjust as needed)
     BNE SkipTimerIncX     ; not yet time to increment
 
     ; Reset frame delay
@@ -1425,7 +1425,7 @@ StartTimerX:
 
     ; Load current timer value
     LDA TimerCounterX
-    CMP #$09
+    CMP #$20
     BEQ TimerDoneX        ; If timer == 9, jump to done routine
 
     ; Increment timer
@@ -1433,10 +1433,9 @@ StartTimerX:
     ADC #$01
     STA TimerCounterX
 
-LDA $02EB
-  CLC
+    LDA $02EB
+    CLC
     ADC #$01
-
     STA $02EB
 
 
@@ -1701,16 +1700,16 @@ STA $2001
 
 ;color
 
-LDA #$27
+LDA #$02
 STA $0232
 
-LDA #$27
+LDA #$02
 STA $0236
 
-LDA #$27
+LDA #$02
 STA $023A
 
-LDA #$27
+LDA #$02
 STA $023E
 
 
@@ -1805,8 +1804,8 @@ background:
   .byte $E0,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25  ;;row 1
   .byte $25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
 
-  .byte $E0,$25,$25,$D3,$E4,$25,$D4,$D5,$D6,$D7,$D9,$25,$25,$25,$25,$E3  ;;row 1
-  .byte $E3,$E3,$E3,$E3,$25,$25,$25,$25,$25,$CE,$CC,$CD,$25,$25,$25,$E2  ;;row 1
+  .byte $E0,$25,$25,$D3,$E4,$25,$D4,$D5,$D6,$D7,$D9,$25,$25,$25,$DE,$DF  ;;row 1
+  .byte $25,$25,$E3,$E3,$E3,$25,$25,$25,$25,$CF,$CC,$CD,$25,$25,$25,$E2  ;;row 1
 
   .byte $E0,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25  ;;row 1
   .byte $25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$25,$E2  ;;row 1
@@ -1928,9 +1927,9 @@ sprites:
   .byte $40, $8E, $03, $A9   ;
   .byte $40, $8F, $03, $B1   ;
 
-  .byte $10, $B1, $00, $10   ;
+  .byte $CE, $B1, $03, $80   ; timer
 
-  .byte $CC, $43, $02, $A4   ;
+  .byte $CC, $43, $02, $AB   ; car icon
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
