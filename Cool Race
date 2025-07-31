@@ -24,6 +24,8 @@
     FrameDelayCounter3: .res 1    ; how many frames to wait before incrementing timer 
     TimerCounterX:      .res 1    ; current timer value (0 to 9)
     FrameDelayCounterX: .res 1    ; how many frames to wait before incrementing timer 
+    TimerCounterX2:      .res 1    ; current timer value (0 to 9)
+    FrameDelayCounterX2: .res 1    ; how many frames to wait before incrementing timer 
 .segment "CODE"
 
 
@@ -44,6 +46,8 @@ Sprite3_X = $029F
 
 Player1SpriteTwo_X = $021F
 
+HoleSprite_X = $0233 
+HoleSprite_Y = $0230
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Subroutines ;;;
@@ -346,6 +350,8 @@ JSR StartTimer
 JSR StartTimer2
 JSR StartTimer3
 JSR StartTimerX
+JSR StartTimerX2
+
 
 
 ;removes the title when game starts
@@ -1195,6 +1201,47 @@ heckOtherCollision2x:
 NoCollision2xx:
 
 
+
+
+
+
+
+
+heckOtherCollision2xx:
+
+  LDA Player1SpriteTwo_X
+  CLC
+  ADC #8 
+  CMP HoleSprite_X
+  BCC NoCollision2xxx
+
+  LDA HoleSprite_X
+  CLC
+  ADC #8 
+  CMP Player1SpriteTwo_X
+  BCC NoCollision2xxx
+
+  LDA Player1SpriteTwo_Y
+  CLC
+  ADC #8 
+  CMP HoleSprite_Y
+  BCC NoCollision2xxx
+
+  LDA HoleSprite_Y
+  CLC
+  ADC #8 
+  CMP Player1SpriteTwo_Y
+  BCC NoCollision2xxx
+
+  JMP CollisionDetected
+
+NoCollision2xxx:
+
+
+
+
+
+
 RTI             ; return from interrupt
 
 
@@ -1409,6 +1456,67 @@ RTS
 
 
 
+
+
+
+
+StartTimerX2:
+    ; Increment frame delay counter
+    LDA FrameDelayCounterX2
+    CLC
+    ADC #1
+    STA FrameDelayCounterX2
+
+    CMP #$EC             ; wait ~32 frames (adjust as needed)
+    BNE SkipTimerIncX2     ; not yet time to increment
+
+    ; Reset frame delay
+    LDA #$00
+    STA FrameDelayCounterX2
+
+    ; Load current timer value
+    LDA TimerCounterX2
+    CMP #$08
+    BEQ TimerDoneX2        ; If timer == 9, jump to done routine
+
+    ; Increment timer
+    CLC
+    ADC #$01
+    STA TimerCounterX2
+
+
+SkipTimerIncX2:
+    RTS
+
+TimerDoneX2:
+    ; Call your subroutine here
+    JSR TimerReachedNineX2
+    RTS
+
+
+TimerReachedNineX2:
+
+
+
+LDA #$89
+STA $0230
+
+LDA #$12
+STA $0231
+
+LDA #$02
+STA $0232
+
+RTS
+
+
+
+
+
+
+
+
+
 StartTimerX:
     ; Increment frame delay counter
     LDA FrameDelayCounterX
@@ -1449,6 +1557,7 @@ TimerDoneX:
 
 
 TimerReachedNineX:
+
 
 RTS
 
