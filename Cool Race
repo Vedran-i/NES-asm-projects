@@ -1773,20 +1773,20 @@ youwin:
 
 LDA #$30
 STA $0230
-LDA #$60
+LDA #$50
 STA $0233
 
-LDA #$68
+LDA #$58
 STA $0237
 LDA #$30
 STA $0234
 
-LDA #$78
+LDA #$68
 STA $023B
 LDA #$30
 STA $0238
 
-LDA #$80
+LDA #$70
 STA $023F
 LDA #$30
 STA $023C
@@ -1820,6 +1820,63 @@ STA $023A
 
 LDA #$02
 STA $023E
+
+
+
+
+    ; Enable Sound channel
+    lda #%00000001
+    sta $4015           ; Enable Square 1 channel, disable others
+
+    lda #%00010110
+    sta $4015           ; Enable Square 2, Triangle, and DMC channels. Disable Square 1 and Noise.
+
+    lda #$0F
+    sta $4015           ; Enable Square 1, Square 2, Triangle, and Noise channels. Disable DMC.
+
+    lda #%00000111      ; Enable Square 1, Square 2, and Triangle channels
+    sta $4015
+
+
+    ; Square 2 (E note)
+    lda #%01110110      ; Duty 01, Volume 6
+    sta $4004
+    lda #$A9            ; $0A9 is an E in NTSC mode
+    sta $4006
+    lda #$00
+    sta $4007
+
+    ; Triangle (G# note)
+    lda #%10000001      ; Triangle channel on
+    sta $4008
+    lda #$42            ; $042 is a G# in NTSC mode
+    sta $400A
+    lda #$00
+    sta $400B
+
+
+
+DelayLoopX1x:
+  LDX #$Fb            ; Outer loop for a longer delay   
+DelayLoopOuterX1x:
+  LDY #$Fb            ; Inner loop
+DelayLoopInnerX1x:
+  DEY
+  BNE DelayLoopInnerX1x  ; Repeat inner loop until Y = 0
+  DEX
+  BNE DelayLoopOuterX1x  ; Repeat outer loop until X = 0
+
+;Stops sound
+  LDA #$00
+  STA $4015
+
+
+
+
+
+
+
+
 
 
 LDA #2
